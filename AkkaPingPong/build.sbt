@@ -1,7 +1,7 @@
 lazy val commonSettings = Seq(
   organization := "com.kaihaosw",
   version := "0.1.0",
-  scalaVersion := "2.11.6"
+  scalaVersion := "2.11.7"
 )
 
 lazy val root = (project in file(".")).
@@ -9,6 +9,6 @@ lazy val root = (project in file(".")).
   settings(
     name := "Akka-ping-pong",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.3.11"
+      "com.typesafe.akka" %% "akka-actor" % "2.3.13"
     )
   )
