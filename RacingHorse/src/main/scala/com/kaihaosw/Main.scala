@@ -1,9 +1,7 @@
 package com.kaihaosw
 
-import akka.actor.ActorSystem
-import akka.actor.Props
+import akka.actor.{ActorSystem, Props}
 import com.kaihaosw.actors._
-
 
 object RacingHorseApplication {
   def main(args: Array[String]): Unit = {
@@ -14,7 +12,5 @@ object RacingHorseApplication {
     import Game._
 
     gameActor ! Start
-
-    system.shutdown()
   }
 }

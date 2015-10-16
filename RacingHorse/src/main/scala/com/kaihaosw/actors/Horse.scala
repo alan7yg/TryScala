@@ -5,15 +5,13 @@ import scala.util.Random
 
 object Horse {
   case object Run
-  case class Observe(track: String)
+  case class Observe(id: String, track: String)
 }
 
-
-class HorseActor extends Actor {
+class HorseActor(id: String) extends Actor {
   import Horse._
 
-  var counter = 0
-  var track = " "
+  var track = ""
 
   def randomStep: Int = (new Random()).nextInt(3)
 
@@ -22,11 +20,11 @@ class HorseActor extends Actor {
     println(this)
   }
 
-  override def toString = "Horse " + this.hashCode + track
+  override def toString = "Horse " + id + " " + track
 
   def receive: Receive = {
     case Run =>
       run()
-      sender ! Observe(track)
+      sender ! Observe(id, track)
   }
 }
