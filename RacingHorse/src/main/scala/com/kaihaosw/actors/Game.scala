@@ -1,7 +1,6 @@
 package com.kaihaosw.actors
 
 import akka.actor.{Actor, ActorRef, PoisonPill, Props}
-import scala.collection.mutable.MutableList
 
 object Game {
   case object Start
