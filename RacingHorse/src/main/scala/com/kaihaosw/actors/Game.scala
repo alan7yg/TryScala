@@ -1,6 +1,7 @@
 package com.kaihaosw.actors
 
 import akka.actor.{Actor, ActorRef, PoisonPill, Props}
+import akka.routing.{BroadcastRouter, RandomRouter}
 
 object Game {
   case object Start
@@ -12,23 +13,44 @@ class GameActor extends Actor {
 
   val horseNumber = 5
   val trackLength = 100
+  var observeCount = 0
 
-  val horseActorList: IndexedSeq[ActorRef] =
-    (1 to horseNumber).map(n => context.actorOf(Props(new HorseActor(n.toString)), "horse-" + n))
+  val horseActorVector: Vector[ActorRef] =
+    (1 to horseNumber).map(n => context.actorOf(Props(new HorseActor(n.toString)), "horse-" + n)).toVector
 
-  def receive: Receive = {
+  val broadcastHorses = context.actorOf(Props.empty.withRouter(BroadcastRouter(routees = horseActorVector)))
+
+  def broadcastRun: PartialFunction[Any, Unit] = {
     case o: Observe =>
+      observeCount += 1
       if (o.track.length >= trackLength) {
-        horseActorList.foreach { horse =>
-          horse ! PoisonPill
-        }
+        broadcastHorses ! PoisonPill
         println(o.id + " wins")
         context.system.shutdown
-      } else
-        sender ! Run
-    case Start =>
-      horseActorList.map { horse =>
-        horse ! Run
       }
+      if (observeCount == horseNumber) {
+        observeCount = 0
+        println()
+        broadcastHorses ! Run
+      }
+    case Start =>
+      broadcastHorses ! Run
   }
+
+  val randomHorses = context.actorOf(Props.empty.withRouter(RandomRouter(routees = horseActorVector)))
+
+  def randomRun: PartialFunction[Any, Unit] = {
+    case o: Observe =>
+      if (o.track.length >= trackLength) {
+        broadcastHorses ! PoisonPill
+        println(o.id + " wins")
+        context.system.shutdown
+      }
+      else
+        randomHorses ! Run
+    case Start =>
+      randomHorses ! Run
+  }
+
+  def receive: Receive = broadcastRun
 }
