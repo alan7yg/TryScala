@@ -1,9 +1,6 @@
 package com.kaihaosw.local
 
-import akka.actor.Actor
-import akka.actor.ActorRef
-import akka.actor.PoisonPill
-import akka.actor.Props
+import akka.actor.{Actor, ActorRef, PoisonPill, Props}
 import akka.routing.BroadcastRouter
 
 object GameStation {
@@ -12,6 +9,7 @@ object GameStation {
 
 class GameStationActor extends Actor {
   import Horse._
+  import GameStation._
 
   val horseNumber = 5
   val trackLength = 100
@@ -35,5 +33,7 @@ class GameStationActor extends Actor {
         println()
         broadcastHorses ! Run
       }
+    case Start =>
+      broadcastHorses ! Run
   }
 }
