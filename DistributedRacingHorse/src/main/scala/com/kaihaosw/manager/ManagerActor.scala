@@ -21,9 +21,11 @@ class ManagerActor(gameSize: Int) extends Actor {
         gameStationsRouter ! GameStart
       }
     case r: GameResult =>
-      println(s"Game has finished firstly by ${sender} with result: ${r}")
-      gameStationsRouter ! GameShut
-      gameCount = 0
-      gameStations = List.empty[ActorRef]
+      if (gameCount != 0) {
+        println(s"Game has finished firstly by ${sender} with result: ${r}")
+        gameStationsRouter ! GameShut
+        gameCount = 0
+        gameStations = List.empty[ActorRef]
+      }
   }
 }
