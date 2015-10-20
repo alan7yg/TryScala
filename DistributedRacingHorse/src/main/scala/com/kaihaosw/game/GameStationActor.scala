@@ -19,7 +19,7 @@ class GameStationActor extends Actor {
   var observeCount = 0
   var result: Option[Observe] = None
 
-  val managerActor = context.actorSelection("akka.tcp://DRHManagerSystem@192.168.199.159:2553/user/manager")
+  val managerActor = context.actorSelection("akka.tcp://DRHManagerSystem@127.0.0.1:2553/user/manager")
 
   val horseActorVector: Vector[ActorRef] =
     (1 to horseNumber).map(n => context.actorOf(Props(new HorseActor(n.toString)), "horse-" + n)).toVector

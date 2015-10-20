@@ -17,10 +17,10 @@ class HorseActor(id: String) extends Actor {
 
   def run(): Unit = {
     track += "*" * randomStep
-    println(track)
+    println(this)
   }
 
-  override def toString: String = s"Horse '$id' '$track'"
+  override def toString: String = s"Horse ${id} ${track}"
 
   def receive: Receive = {
     case Run =>
