@@ -14,6 +14,7 @@ class GameActor extends Actor {
   val horseNumber = 5
   val trackLength = 100
   var observeCount = 0
+  var winCount = 0
 
   val horseActorVector: Vector[ActorRef] =
     (1 to horseNumber).map(n => context.actorOf(Props(new HorseActor(n.toString)), "horse-" + n)).toVector
@@ -24,8 +25,10 @@ class GameActor extends Actor {
     case o: Observe =>
       observeCount += 1
       if (o.track.length >= trackLength) {
+        winCount += 1
         broadcastHorses ! PoisonPill
-        println(o.id + " wins")
+        if (winCount == 1)
+          println(o.id + " wins")
         context.system.shutdown
       }
       if (observeCount == horseNumber) {
