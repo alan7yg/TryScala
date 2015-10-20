@@ -17,6 +17,7 @@ class GameStationActor extends Actor {
   val horseNumber = 5
   val trackLength = 100
   var observeCount = 0
+  var result: Option[Observe] = None
 
   val managerActor = context.actorSelection("akka.tcp://DRHManagerSystem@192.168.199.159:2553/user/manager")
 
@@ -28,10 +29,12 @@ class GameStationActor extends Actor {
   def receive: Receive = {
     case o: Observe =>
       observeCount += 1
-      if (o.trackLength >= trackLength) {
+      if (o.trackLength >= trackLength && result.isEmpty) {
+        result = Some(o)
         broadcastHorses ! PoisonPill
         println(o.id + " wins")
         managerActor ! Result(o.id)
+        // context.system.shutdown
       }
       if (observeCount == horseNumber) {
         observeCount = 0

@@ -12,5 +12,6 @@ object GameStationApplication {
     val gameStationActor = system.actorOf(Props[GameStationActor], "gameStationActor")
 
     gameStationActor ! GameStationMsg.Init
+    // gameStationActor ! GameStationMsg.Start
   }
 }
