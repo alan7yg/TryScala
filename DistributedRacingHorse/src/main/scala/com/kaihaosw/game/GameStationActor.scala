@@ -7,6 +7,7 @@ object GameStationMsg {
   case object Init
   case object Start
   case class Result(winner: String)
+  case object Shut
 }
 
 class GameStationActor extends Actor {
@@ -17,7 +18,7 @@ class GameStationActor extends Actor {
   val trackLength = 100
   var observeCount = 0
 
-  val managerActor = context.actorSelection("akka.tcp://DRHManagerSystem@127.0.0.1:2553/user/manager")
+  val managerActor = context.actorSelection("akka.tcp://DRHManagerSystem@192.168.199.159:2553/user/manager")
 
   val horseActorVector: Vector[ActorRef] =
     (1 to horseNumber).map(n => context.actorOf(Props(new HorseActor(n.toString)), "horse-" + n)).toVector
@@ -31,7 +32,6 @@ class GameStationActor extends Actor {
         broadcastHorses ! PoisonPill
         println(o.id + " wins")
         managerActor ! Result(o.id)
-        context.system.shutdown
       }
       if (observeCount == horseNumber) {
         observeCount = 0
@@ -42,5 +42,7 @@ class GameStationActor extends Actor {
       broadcastHorses ! Run
     case Init =>
       managerActor ! Init
+    case Shut =>
+      context.system.shutdown
   }
 }
