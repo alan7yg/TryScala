@@ -1,19 +1,25 @@
-package com.kaihaosw.local
+package com.kaihaosw.game
 
 import akka.actor.{Actor, ActorRef, PoisonPill, Props}
 import akka.routing.BroadcastRouter
 
-object GameStation {
+object GameStationMsg {
+  case object Init
   case object Start
+  case class Result(winner: String)
+  case object Shut
 }
 
 class GameStationActor extends Actor {
   import Horse._
-  import GameStation._
+  import GameStationMsg._
 
   val horseNumber = 5
   val trackLength = 100
   var observeCount = 0
+  var result: Option[Observe] = None
+
+  val managerActor = context.actorSelection("akka.tcp://DRHManagerSystem@192.168.199.159:2553/user/manager")
 
   val horseActorVector: Vector[ActorRef] =
     (1 to horseNumber).map(n => context.actorOf(Props(new HorseActor(n.toString)), "horse-" + n)).toVector
@@ -23,10 +29,12 @@ class GameStationActor extends Actor {
   def receive: Receive = {
     case o: Observe =>
       observeCount += 1
-      if (o.trackLength >= trackLength) {
+      if (o.trackLength >= trackLength && result.isEmpty) {
+        result = Some(o)
         broadcastHorses ! PoisonPill
         println(o.id + " wins")
-        context.system.shutdown
+        managerActor ! Result(o.id)
+        // context.system.shutdown
       }
       if (observeCount == horseNumber) {
         observeCount = 0
@@ -35,5 +43,9 @@ class GameStationActor extends Actor {
       }
     case Start =>
       broadcastHorses ! Run
+    case Init =>
+      managerActor ! Init
+    case Shut =>
+      context.system.shutdown
   }
 }

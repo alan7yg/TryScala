@@ -1,4 +1,4 @@
-package com.kaihaosw.local
+package com.kaihaosw.game
 
 import akka.actor.Actor
 import scala.util.Random
